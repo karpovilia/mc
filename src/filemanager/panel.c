@@ -2983,8 +2983,6 @@ chdir_other_panel (WPanel *panel)
     if (curr_entry != NULL)
         panel_set_current_by_name (p, curr_entry);
     (void) change_panel ();
-
-    move_down (panel);
 }
 
 /* --------------------------------------------------------------------------------------------- */
@@ -3729,6 +3727,16 @@ panel_key (WPanel *panel, int key)
     if (is_abort_char (key))
     {
         stop_search (panel);
+        return MSG_HANDLED;
+    }
+
+    /* Ctrl+Arrow towards the other panel: open dir under cursor on the other panel */
+    if ((key == (KEY_M_CTRL | KEY_LEFT) && panel == right_panel)
+        || (key == (KEY_M_CTRL | KEY_RIGHT) && panel == left_panel))
+    {
+        if (panel->quick_search.active)
+            stop_search (panel);
+        chdir_other_panel (panel);
         return MSG_HANDLED;
     }
 
