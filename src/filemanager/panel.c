@@ -179,7 +179,7 @@ static panel_field_t panel_fields[] = {
     { "extension", 12, TRUE, J_LEFT_FIT,
       // TRANSLATORS: one single character to represent 'extension' sort mode
       // TRANSLATORS: no need to translate 'sort', it's just a context prefix
-      N_ ("sort|e"), N_ ("E&xtension"), TRUE, FALSE, string_file_ext, (GCompareFunc) sort_ext },
+      N_ ("sort|e"), N_ ("E&xt"), TRUE, FALSE, string_file_ext, (GCompareFunc) sort_ext },
     { "size", 7, FALSE, J_RIGHT,
       // TRANSLATORS: one single character to represent 'size' sort mode
       // TRANSLATORS: no need to translate 'sort', it's just a context prefix
@@ -3001,8 +3001,6 @@ chdir_other_panel (WPanel *panel)
     if (curr_entry != NULL)
         panel_set_current_by_name (p, curr_entry);
     (void) change_panel ();
-
-    move_down (panel);
 }
 
 /* --------------------------------------------------------------------------------------------- */
@@ -3820,6 +3818,16 @@ panel_key (WPanel *panel, int key)
     if (is_abort_char (key))
     {
         stop_search (panel);
+        return MSG_HANDLED;
+    }
+
+    /* Ctrl+Arrow towards the other panel: open dir under cursor on the other panel */
+    if ((key == (KEY_M_CTRL | KEY_LEFT) && panel == right_panel)
+        || (key == (KEY_M_CTRL | KEY_RIGHT) && panel == left_panel))
+    {
+        if (panel->quick_search.active)
+            stop_search (panel);
+        chdir_other_panel (panel);
         return MSG_HANDLED;
     }
 
